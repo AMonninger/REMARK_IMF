@@ -1,0 +1,21 @@
+name: HARK_SSJ_env
+channels:
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10.0
+  - econ-ark==0.13.0
+  - numpy==1.23
+  - matplotlib==3.6
+  - seaborn==0.12
+  - pandas==1.5
+  - ipywidgets
+  - chardet
+  - scipy
+  - pip
+  - pandas_datareader
+  - openpyxl
+  - xlsx2csv
+  - sequence-jacobian
+  - numba==0.52.0 # To run SSJ. Later versions could lead to problems

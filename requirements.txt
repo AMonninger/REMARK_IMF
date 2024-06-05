@@ -1,0 +1,8 @@
+numpy==1.26.4
+voila==0.1.22
+ipywidgets==7.5.1
+matplotlib==3.3.1
+econ-ark==0.13.0
+sequence-jacobian
+tqdm
+numba==0.52.0 # To run SSJ. Later versions could lead to problems
