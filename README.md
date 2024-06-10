@@ -13,7 +13,10 @@ This REMARK contains notebooks to solve HANK models using HARK and SSJ.
 - Navigate to a folder you like eg 
 ```
 cd "OneDrive - International Monetary Fund (PRD)"
+```
 Create a folder GitHub
+```
+mkdir GitHub
 cd GitHub
 ```
 (You can navigate with the command "cd" to get one folder back use "cd ." and to see what folders are in a directory use "ls")
