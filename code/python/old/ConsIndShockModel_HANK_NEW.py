@@ -2518,6 +2518,180 @@ class IndShockConsumerType(PerfForesightConsumerType):
             ):  # If true Use Harmenberg 2021's Neutral Measure. For more information, see https://econ-ark.org/materials/harmenberg-aggregation?launch
                 self.dist_pGrid = self.T_cycle * [np.array([1])]
 
+    # def calc_transition_matrix(self, shk_dstn=None):
+    #     """
+    #     Calculates how the distribution of agents across market resources
+    #     transitions from one period to the next. If finite horizon problem, then calculates
+    #     a list of transition matrices, consumption and asset policy grids for each period of the problem.
+    #     The transition matrix/matrices and consumption and asset policy grid(s) are stored as attributes of self.
+
+
+    #     Parameters
+    #     ----------
+    #         shk_dstn: list
+    #             list of income shock distributions. Each Income Shock Distribution should be a DiscreteDistribution Object (see Distribution.py)
+    #     Returns
+    #     -------
+    #     None
+
+    #     """
+
+    #     if self.cycles == 0:  # Infinite Horizon Problem
+    #         if not hasattr(shk_dstn, "pmv"):
+    #             shk_dstn = self.IncShkDstn
+
+    #         dist_mGrid = self.dist_mGrid  # Grid of market resources
+    #         dist_pGrid = self.dist_pGrid  # Grid of permanent incomes
+    #         # assets next period
+    #         aNext = dist_mGrid - self.solution[0].cFunc(dist_mGrid)
+
+    #         self.aPol_Grid = aNext  # Steady State Asset Policy Grid
+    #         # Steady State Consumption Policy Grid
+    #         self.cPol_Grid = self.solution[0].cFunc(dist_mGrid)
+
+    #         # Obtain shock values and shock probabilities from income distribution
+    #         # Bank Balances next period (Interest rate * assets)
+    #         bNext = self.Rfree * aNext
+    #         shk_prbs = shk_dstn[0].pmv  # Probability of shocks
+    #         tran_shks = shk_dstn[0].atoms[1]  # Transitory shocks
+    #         perm_shks = shk_dstn[0].atoms[0]  # Permanent shocks
+    #         LivPrb = self.LivPrb[0]  # Update probability of staying alive
+
+
+    #         # New borns have this distribution (assumes start with no assets and permanent income=1)
+    #        # NewBornDist = jump_to_grid_2D(
+    #        #     tran_shks, np.ones_like(tran_shks), shk_prbs, dist_mGrid, dist_pGrid
+    #        # )
+
+    #         if len(dist_pGrid) == 1:
+                
+    #             NewBornDist = jump_to_grid_1D(
+    #                 np.zeros_like(tran_shks),
+    #                 shk_prbs,
+    #                 dist_mGrid,)
+                
+                
+    #             # Compute Transition Matrix given shocks and grids.
+    #             self.tran_matrix = gen_tran_matrix_1D(
+    #                 dist_mGrid,
+    #                 bNext,
+    #                 shk_prbs,
+    #                 perm_shks,
+    #                 tran_shks,
+    #                 LivPrb,
+    #                 NewBornDist,
+    #             )
+
+    #         else:
+    #             NewBornDist = jump_to_grid_2D(
+    #                 np.ones_like(tran_shks),
+    #                 np.ones_like(tran_shks),
+    #                 shk_prbs,
+    #                 dist_mGrid,
+    #                 dist_pGrid,
+    #             )
+
+    #             # Generate Transition Matrix
+    #             # Compute Transition Matrix given shocks and grids.
+    #             self.tran_matrix = gen_tran_matrix_2D(
+    #                 dist_mGrid,
+    #                 dist_pGrid,
+    #                 bNext,
+    #                 shk_prbs,
+    #                 perm_shks,
+    #                 tran_shks,
+    #                 LivPrb,
+    #                 NewBornDist,
+    #             )
+
+    #     elif self.cycles > 1:
+    #         raise Exception("calc_transition_matrix requires cycles = 0 or cycles = 1")
+
+    #     elif self.T_cycle != 0:  # finite horizon problem
+    #         if not hasattr(shk_dstn, "pmv"):
+    #             shk_dstn = self.IncShkDstn
+
+    #         self.cPol_Grid = (
+    #             [] )  # List of consumption policy grids for each period in T_cycle
+    #         self.aPol_Grid = []  # List of asset policy grids for each period in T_cycle
+    #         self.tran_matrix = []  # List of transition matrices
+
+    #         dist_mGrid = self.dist_mGrid
+    #         #dist_aGrid = deepcopy(self.dist_mGrid)
+            
+    #         #dist_mGrid_temp  = dist_aGrid*self.Rfree[k] +
+    #         for k in range(self.T_cycle):
+                
+    #             if type(self.dist_pGrid) == list:
+    #                 # Permanent income grid this period
+    #                 dist_pGrid = self.dist_pGrid[k]
+    #             else:
+    #                 dist_pGrid = (
+    #                     self.dist_pGrid
+    #                 )  # If here then use prespecified permanent income grid
+
+    #             # Consumption policy grid in period k
+    #             #Cnow = self.solution[k].cFunc(dist_mGrid)
+    #             Cnow = self.solution[k].cFunc(dist_mGrid)
+
+    #             self.cPol_Grid.append(Cnow)  # Add to list
+
+    #             aNext = dist_mGrid - Cnow  # Asset policy grid in period k
+    #             self.aPol_Grid.append(aNext)  # Add to list
+
+    #             if type(self.Rfree) == list:
+    #                 bNext = self.Rfree[k] * aNext
+    #             else:
+    #                 bNext = self.Rfree * aNext
+
+    #             # Obtain shocks and shock probabilities from income distribution this period
+    #             shk_prbs = shk_dstn[k].pmv  # Probability of shocks this period
+    #             # Transitory shocks this period
+    #             tran_shks = shk_dstn[k].atoms[1]
+    #             # Permanent shocks this period
+    #             perm_shks = shk_dstn[k].atoms[0]
+    #             # Update probability of staying alive this period
+    #             LivPrb = self.LivPrb[k]
+
+    #             if len(dist_pGrid) == 1:
+    #                 # New borns have this distribution (assumes start with no assets and permanent income=1)
+    #                 NewBornDist = jump_to_grid_1D(
+    #                     np.zeros_like(tran_shks),
+    #                     shk_prbs,
+    #                     dist_mGrid,)
+    #                 # Compute Transition Matrix given shocks and grids.
+    #                 TranMatrix_M = gen_tran_matrix_1D(
+    #                     dist_mGrid,
+    #                     bNext,
+    #                     shk_prbs,
+    #                     perm_shks,
+    #                     tran_shks,
+    #                     LivPrb,
+    #                     NewBornDist,
+    #                 )
+    #                 self.tran_matrix.append(TranMatrix_M)
+
+    #             else:
+    #                 NewBornDist = jump_to_grid_2D(
+    #                     np.ones_like(tran_shks),
+    #                     np.ones_like(tran_shks),
+    #                     shk_prbs,
+    #                     dist_mGrid,
+    #                     dist_pGrid,
+    #                 )
+    #                 # Compute Transition Matrix given shocks and grids.
+    #                 TranMatrix = gen_tran_matrix_2D(
+    #                     dist_mGrid,
+    #                     dist_pGrid,
+    #                     bNext,
+    #                     shk_prbs,
+    #                     perm_shks,
+    #                     tran_shks,
+    #                     LivPrb,
+    #                     NewBornDist,
+    #                 )
+    #                 self.tran_matrix.append(TranMatrix)
+
     def calc_transition_matrix(self, shk_dstn=None):
         """
         Calculates how the distribution of agents across market resources
@@ -2557,20 +2731,15 @@ class IndShockConsumerType(PerfForesightConsumerType):
             perm_shks = shk_dstn[0].atoms[0]  # Permanent shocks
             LivPrb = self.LivPrb[0]  # Update probability of staying alive
 
-
             # New borns have this distribution (assumes start with no assets and permanent income=1)
-           # NewBornDist = jump_to_grid_2D(
-           #     tran_shks, np.ones_like(tran_shks), shk_prbs, dist_mGrid, dist_pGrid
-           # )
+            NewBornDist = jump_to_grid_2D(
+                tran_shks, np.ones_like(tran_shks), shk_prbs, dist_mGrid, dist_pGrid
+            )
 
             if len(dist_pGrid) == 1:
-                
                 NewBornDist = jump_to_grid_1D(
-                    np.ones_like(tran_shks),
-                    shk_prbs,
-                    dist_mGrid,)
-                
-                
+                    np.ones_like(tran_shks), shk_prbs, dist_mGrid
+                )
                 # Compute Transition Matrix given shocks and grids.
                 self.tran_matrix = gen_tran_matrix_1D(
                     dist_mGrid,
@@ -2611,17 +2780,15 @@ class IndShockConsumerType(PerfForesightConsumerType):
             if not hasattr(shk_dstn, "pmv"):
                 shk_dstn = self.IncShkDstn
 
-            self.cPol_Grid = (
-                [] )  # List of consumption policy grids for each period in T_cycle
-            self.aPol_Grid = []  # List of asset policy grids for each period in T_cycle
+            self.cPol_Grid = []
+            # List of consumption policy grids for each period in T_cycle
+            self.aPol_Grid = []
+            # List of asset policy grids for each period in T_cycle
             self.tran_matrix = []  # List of transition matrices
 
             dist_mGrid = self.dist_mGrid
-            #dist_aGrid = deepcopy(self.dist_mGrid)
-            
-            #dist_mGrid_temp  = dist_aGrid*self.Rfree[k] +
+
             for k in range(self.T_cycle):
-                
                 if type(self.dist_pGrid) == list:
                     # Permanent income grid this period
                     dist_pGrid = self.dist_pGrid[k]
@@ -2631,9 +2798,7 @@ class IndShockConsumerType(PerfForesightConsumerType):
                     )  # If here then use prespecified permanent income grid
 
                 # Consumption policy grid in period k
-                #Cnow = self.solution[k].cFunc(dist_mGrid)
                 Cnow = self.solution[k].cFunc(dist_mGrid)
-
                 self.cPol_Grid.append(Cnow)  # Add to list
 
                 aNext = dist_mGrid - Cnow  # Asset policy grid in period k
@@ -2656,9 +2821,8 @@ class IndShockConsumerType(PerfForesightConsumerType):
                 if len(dist_pGrid) == 1:
                     # New borns have this distribution (assumes start with no assets and permanent income=1)
                     NewBornDist = jump_to_grid_1D(
-                        np.ones_like(tran_shks),
-                        shk_prbs,
-                        dist_mGrid,)
+                        np.ones_like(tran_shks), shk_prbs, dist_mGrid
+                    )
                     # Compute Transition Matrix given shocks and grids.
                     TranMatrix_M = gen_tran_matrix_1D(
                         dist_mGrid,
@@ -2749,13 +2913,312 @@ class IndShockConsumerType(PerfForesightConsumerType):
         return self.A_ss, self.C_ss
     
 
+    # def calc_jacobian(self, shk_param, T):
+    #     """
+    #     Calculates the Jacobians of aggregate consumption and aggregate assets. Parameters that can be shocked are
+    #     LivPrb, PermShkStd,TranShkStd, DiscFac, UnempPrb, Rfree, IncUnemp, DiscFac .
+
+    #     Parameters:
+    #     ----------
+
+    #     shk_param: string
+    #         name of variable to be shocked
+
+    #     T: int
+    #         dimension of Jacobian Matrix. Jacobian Matrix is a TxT square Matrix
+
+
+    #     Returns
+    #     ----------
+    #     CJAC: numpy.array
+    #         TxT Jacobian Matrix of Aggregate Consumption with respect to shk_param
+
+    #     AJAC: numpy.array
+    #         TxT Jacobian Matrix of Aggregate Assets with respect to shk_param
+
+    #     """
+
+    #     # Set up finite Horizon dictionary
+    #     params = deepcopy(self.__dict__["parameters"])
+    #     params["T_cycle"] = T  # Dimension of Jacobian Matrix
+
+    #     # Specify a dictionary of lists because problem we are solving is technically finite horizon so variables can be time varying (see section on fake news algorithm in https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA17434 )
+    #     params["LivPrb"] = params["T_cycle"] * [self.LivPrb[0]]
+    #     params["PermGroFac"] = params["T_cycle"] * [self.PermGroFac[0]]
+    #     params["PermShkStd"] = params["T_cycle"] * [self.PermShkStd[0]]
+    #     params["TranShkStd"] = params["T_cycle"] * [self.TranShkStd[0]]
+    #     params["Rfree"] = params["T_cycle"] * [self.Rfree]
+    #     params["UnempPrb"] = params["T_cycle"] * [self.UnempPrb]
+    #     params["IncUnemp"] = params["T_cycle"] * [self.IncUnemp]
+        
+    #     params['wage'] = params['T_cycle']*[self.wage[0]]
+    #     params['taxrate'] = params['T_cycle']*[self.taxrate[0]]
+    #     params['labor'] = params['T_cycle']*[self.labor[0]]
+    #     params['TranShkMean_Func'] = params['T_cycle']*[self.TranShkMean_Func[0]]
+
+    #     # Create instance of a finite horizon agent
+    #     FinHorizonAgent = IndShockConsumerType(**params)
+    #     FinHorizonAgent.cycles = 1  # required
+
+    #     # delete Rfree from time invariant list since it varies overtime
+    #     FinHorizonAgent.del_from_time_inv("Rfree")
+    #     # Add Rfree to time varying list to be able to introduce time varying interest rates
+    #     FinHorizonAgent.add_to_time_vary("Rfree")
+
+    #     # Set Terminal Solution as Steady State Consumption Function
+    #     # FinHorizonAgent.cFunc_terminal_ = deepcopy(self.solution[0].cFunc)
+    #     FinHorizonAgent.solution_terminal = deepcopy(self.solution[0])
+
+    #     dx = 0.0001  # Size of perturbation
+    #     # Period in which the change in the interest rate occurs (second to last period)
+    #     i = params["T_cycle"] - 1
+
+    #     FinHorizonAgent.IncShkDstn = params["T_cycle"] * [self.IncShkDstn[0]]
+
+    #     # If parameter is in time invariant list then add it to time vary list
+    #     FinHorizonAgent.del_from_time_inv(shk_param)
+    #     FinHorizonAgent.add_to_time_vary(shk_param)
+
+    #     # this condition is because some attributes are specified as lists while other as floats
+    #     if type(getattr(self, shk_param)) == list:
+    #         peturbed_list = (
+    #             (i) * [getattr(self, shk_param)[0]]
+    #             + [getattr(self, shk_param)[0] + dx]
+    #             + (params["T_cycle"] - i - 1) * [getattr(self, shk_param)[0]]
+    #         )  # Sequence of interest rates the agent faces
+    #     else:
+    #         peturbed_list = (
+    #             (i) * [getattr(self, shk_param)]
+    #             + [getattr(self, shk_param) + dx]
+    #             + (params["T_cycle"] - i - 1) * [getattr(self, shk_param)]
+    #         )  # Sequence of interest rates the agent 
+            
+    #     setattr(FinHorizonAgent, shk_param, peturbed_list)
+
+    #     # Update income process if perturbed parameter enters the income shock distribution
+    #     FinHorizonAgent.update_income_process()
+
+    #     # Solve
+    #     FinHorizonAgent.solve()
+
+    #     #FinHorizonAgent.Rfree = params["T_cycle"] * [self.Rfree]
+    #     # Use Harmenberg Neutral Measure
+    #     FinHorizonAgent.neutral_measure = True
+    #     FinHorizonAgent.update_income_process()
+
+    #     # Calculate Transition Matrices
+    #     FinHorizonAgent.define_distribution_grid()
+    #     FinHorizonAgent.calc_transition_matrix()
+
+    #     # Fake News Algorithm begins below ( To find fake news algorithm See page 2388 of https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA17434  )
+
+    #     ##########
+    #     # STEP 1 # of fake news algorithm, As in the paper for Curly Y and Curly D. Here the policies are over assets and consumption so we denote them as curly C and curly D.
+    #     ##########
+    #     a_ss = self.aPol_Grid  # steady state Asset Policy
+    #     c_ss = self.cPol_Grid  # steady state Consumption Policy
+    #     tranmat_ss = self.tran_matrix  # Steady State Transition Matrix
+
+    #     # List of asset policies grids where households expect the shock to occur in the second to last Period
+    #     a_t = FinHorizonAgent.aPol_Grid
+    #     # add steady state assets to list as it does not get appended in calc_transition_matrix method
+    #     a_t.append(self.a_ss)
+
+    #     # List of consumption policies grids where households expect the shock to occur in the second to last Period
+    #     c_t = FinHorizonAgent.cPol_Grid
+    #     # add steady state consumption to list as it does not get appended in calc_transition_matrix method
+    #     c_t.append(self.c_ss)
+
+    #     da0_s = []  # Deviation of asset policy from steady state policy
+    #     dc0_s = []  # Deviation of Consumption policy from steady state policy
+    #     for i in range(T):
+    #         da0_s.append(a_t[T - i] - a_ss)
+    #         dc0_s.append(c_t[T - i] - c_ss)
+
+    #     da0_s = np.array(da0_s)
+    #     dc0_s = np.array(dc0_s)
+
+    #     # Steady state distribution of market resources (permanent income weighted distribution)
+    #     D_ss = self.vec_erg_dstn.T[0]
+    #     dA0_s = []
+    #     dC0_s = []
+    #     for i in range(T):
+    #         dA0_s.append(np.dot(da0_s[i], D_ss))
+    #         dC0_s.append(np.dot(dc0_s[i], D_ss))
+
+    #     dA0_s = np.array(dA0_s)
+    #     # This is equivalent to the curly Y scalar detailed in the first step of the algorithm
+    #     A_curl_s = dA0_s / dx
+
+    #     dC0_s = np.array(dC0_s)
+    #     C_curl_s = dC0_s / dx
+
+    #     # List of computed transition matrices for each period
+    #     tranmat_t = FinHorizonAgent.tran_matrix
+    #     tranmat_t.append(tranmat_ss)
+
+    #     # List of change in transition matrix relative to the steady state transition matrix
+    #     dlambda0_s = []
+    #     for i in range(T):
+    #         dlambda0_s.append(tranmat_t[T  -   i] - tranmat_ss)
+
+    #     dlambda0_s = np.array(dlambda0_s)
+
+    #     dD0_s = []
+    #     for i in range(T):
+    #         dD0_s.append(np.dot(dlambda0_s[i], D_ss))
+
+    #     dD0_s = np.array(dD0_s)
+    #     D_curl_s = dD0_s / dx  # Curly D in the sequence space jacobian
+
+    #     ########
+    #     # STEP2 # of fake news algorithm
+    #     ########
+
+    #     # Expectation Vectors
+    #     exp_vecs_a = []
+    #     exp_vecs_c = []
+
+    #     # First expectation vector is the steady state policy
+    #     exp_vec_a = a_ss
+    #     exp_vec_c = c_ss
+    #     for i in range(T):
+    #         exp_vecs_a.append(exp_vec_a)
+    #         exp_vec_a = np.dot(tranmat_ss.T, exp_vec_a)
+
+    #         exp_vecs_c.append(exp_vec_c)
+    #         exp_vec_c = np.dot(tranmat_ss.T, exp_vec_c)
+
+    #     # Turn expectation vectors into arrays
+    #     exp_vecs_a = np.array(exp_vecs_a)
+    #     exp_vecs_c = np.array(exp_vecs_c)
+
+    #     #########
+    #     # STEP3 # of the algorithm. In particular equation 26 of the published paper.
+    #     #########
+    #     # Fake news matrices
+    #     Curl_F_A = np.zeros((T, T))  # Fake news matrix for assets
+    #     Curl_F_C = np.zeros((T, T))  # Fake news matrix for consumption
+
+    #     # First row of Fake News Matrix
+    #     Curl_F_A[0] = A_curl_s
+    #     Curl_F_C[0] = C_curl_s
+        
+
+    #     for i in range(T - 1):
+    #         for j in range(T):
+    #             Curl_F_A[i + 1][j] = np.dot(exp_vecs_a[i], D_curl_s[j])
+    #             Curl_F_C[i + 1][j] = np.dot(exp_vecs_c[i], D_curl_s[j])
+
+    #     ########
+    #     # STEP4 #  of the algorithm
+    #     ########
+        
+    #     # Function to compute jacobian matrix from fake news matrix
+    #     def J_from_F(F):
+    #         J = F.copy()
+    #         for t in range(1, F.shape[0]):
+    #             J[1:, t] += J[:-1, t-1]
+    #         return J
+        
+    #     J_A = J_from_F(Curl_F_A)
+    #     J_C = J_from_F(Curl_F_C)
+        
+    #     ########
+    #     # Additional step due to compute Zeroth Column of the Jacobian
+    #     ########   
+         
+    #     params = deepcopy(self.__dict__["parameters"])
+    #     params["T_cycle"] = 2 # Dimension of Jacobian Matrix
+        
+    #     params["LivPrb"] = params["T_cycle"] * [self.LivPrb[0]]
+    #     params["PermGroFac"] = params["T_cycle"] * [self.PermGroFac[0]]
+    #     params["PermShkStd"] = params["T_cycle"] * [self.PermShkStd[0]]
+    #     params["TranShkStd"] = params["T_cycle"] * [self.TranShkStd[0]]
+    #     params["Rfree"] = params["T_cycle"] * [self.Rfree]
+    #     params["UnempPrb"] = params["T_cycle"] * [self.UnempPrb]
+    #     params["IncUnemp"] = params["T_cycle"] * [self.IncUnemp]
+    #     params['wage'] = params['T_cycle']*[self.wage[0]]
+    #     params['taxrate'] = params['T_cycle']*[self.taxrate[0]]
+    #     params['labor'] = params['T_cycle']*[self.labor[0]]
+    #     params['TranShkMean_Func'] = params['T_cycle']*[self.TranShkMean_Func[0]]
+    #     params['IncShkDstn'] = params['T_cycle']* [self.IncShkDstn[0]]
+    #     params['cFunc_terminal_'] = deepcopy(self.solution[0].cFunc)
+        
+    #     if shk_param == 'DiscFac':
+            
+    #         params['DiscFac'] = params['T_cycle']*[self.DiscFac]
+
+    #     # Create instance of a finite horizon agent for calculation of zeroth
+    #     ZerothColAgent = IndShockConsumerType(**params)
+    #     ZerothColAgent.cycles = 1  # required
+    #     ZerothColAgent.solution_terminal = deepcopy(self.solution[0])
+        
+    #     # If parameter is in time invariant list then add it to time vary list
+    #     ZerothColAgent.del_from_time_inv(shk_param)
+    #     ZerothColAgent.add_to_time_vary(shk_param)
+        
+    #     if type(getattr(self, shk_param)) == list:
+    #         ZerothColAgent.shk_param = params['T_cycle'] * [getattr(self, shk_param)[0]]
+    #     else:
+    #         ZerothColAgent.shk_param = params['T_cycle'] * [getattr(self, shk_param)]
+
+    #     # Update income process if perturbed parameter enters the income shock distribution
+    #     ZerothColAgent.update_income_process()
+
+    #     # Solve
+    #     ZerothColAgent.solve()
+        
+    #     # this condition is because some attributes are specified as lists while other as floats
+    #     if type(getattr(self, shk_param)) == list:
+    #         peturbed_list = (
+    #              [getattr(self, shk_param)[0] + dx]
+    #             + (params["T_cycle"]  - 1) * [getattr(self, shk_param)[0]]
+    #         )  # Sequence of interest rates the agent faces
+    #     else:
+    #         peturbed_list = (
+    #              [getattr(self, shk_param) + dx]
+    #             + (params["T_cycle"]  - 1) * [getattr(self, shk_param)]
+    #         )  # Sequence of interest rates the agent 
+            
+    #     setattr(ZerothColAgent, shk_param, peturbed_list) # Set attribute to agent
+
+    #     # Use Harmenberg Neutral Measure
+    #     ZerothColAgent.neutral_measure = True
+    #     ZerothColAgent.update_income_process()
+
+    #     # Calculate Transition Matrices
+    #     ZerothColAgent.define_distribution_grid()
+    #     ZerothColAgent.calc_transition_matrix()
+        
+    #     tranmat_t_zeroth_col = ZerothColAgent.tran_matrix
+    #     dstn_t_zeroth_col = self.vec_erg_dstn.T[0]
+        
+    #     C_t_no_sim = np.zeros(T)
+    #     A_t_no_sim = np.zeros(T)
+
+    #     for i in range(T):
+    #         if i ==0:
+    #             dstn_t_zeroth_col = np.dot(tranmat_t_zeroth_col[i],dstn_t_zeroth_col)
+    #         else:
+    #             dstn_t_zeroth_col = np.dot(tranmat_ss,dstn_t_zeroth_col)
+                
+    #         C_t_no_sim[i] =  np.dot(self.cPol_Grid ,dstn_t_zeroth_col) 
+    #         A_t_no_sim[i] =  np.dot( self.aPol_Grid ,dstn_t_zeroth_col) 
+
+    #     J_A.T[0] = (A_t_no_sim - self.A_ss)/dx
+    #     J_C.T[0] = (C_t_no_sim - self.C_ss)/dx
+        
+    #     return J_C, J_A
+
     def calc_jacobian(self, shk_param, T):
         """
-        Calculates the Jacobians of aggregate consumption and aggregate assets. Parameters that can be shocked are
-        LivPrb, PermShkStd,TranShkStd, DiscFac, UnempPrb, Rfree, IncUnemp, DiscFac .
+        Calculates the Jacobians of aggregate consumption and aggregate assets.
+        Parameters that can be shocked are LivPrb, PermShkStd,TranShkStd, DiscFac,
+        UnempPrb, Rfree, IncUnemp, and DiscFac.
 
         Parameters:
-        ----------
+        -----------
 
         shk_param: string
             name of variable to be shocked
@@ -2778,7 +3241,10 @@ class IndShockConsumerType(PerfForesightConsumerType):
         params = deepcopy(self.__dict__["parameters"])
         params["T_cycle"] = T  # Dimension of Jacobian Matrix
 
-        # Specify a dictionary of lists because problem we are solving is technically finite horizon so variables can be time varying (see section on fake news algorithm in https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA17434 )
+        # Specify a dictionary of lists because problem we are solving is
+        # technically finite horizon so variables can be time varying (see
+        # section on fake news algorithm in
+        # https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA17434 )
         params["LivPrb"] = params["T_cycle"] * [self.LivPrb[0]]
         params["PermGroFac"] = params["T_cycle"] * [self.PermGroFac[0]]
         params["PermShkStd"] = params["T_cycle"] * [self.PermShkStd[0]]
@@ -2786,23 +3252,23 @@ class IndShockConsumerType(PerfForesightConsumerType):
         params["Rfree"] = params["T_cycle"] * [self.Rfree]
         params["UnempPrb"] = params["T_cycle"] * [self.UnempPrb]
         params["IncUnemp"] = params["T_cycle"] * [self.IncUnemp]
-        
-        params['wage'] = params['T_cycle']*[self.wage[0]]
-        params['taxrate'] = params['T_cycle']*[self.taxrate[0]]
-        params['labor'] = params['T_cycle']*[self.labor[0]]
+        params["wage"] = params["T_cycle"] * [self.wage[0]]
+        params["labor"] = params["T_cycle"] * [self.labor[0]]
+        params["taxrate"] = params["T_cycle"] * [self.taxrate[0]]
+        params["cycles"] = 1  # "finite horizon", sort of
         params['TranShkMean_Func'] = params['T_cycle']*[self.TranShkMean_Func[0]]
+
 
         # Create instance of a finite horizon agent
         FinHorizonAgent = IndShockConsumerType(**params)
-        FinHorizonAgent.cycles = 1  # required
 
         # delete Rfree from time invariant list since it varies overtime
         FinHorizonAgent.del_from_time_inv("Rfree")
         # Add Rfree to time varying list to be able to introduce time varying interest rates
         FinHorizonAgent.add_to_time_vary("Rfree")
 
-        # Set Terminal Solution as Steady State Consumption Function
-        FinHorizonAgent.cFunc_terminal_ = deepcopy(self.solution[0].cFunc)
+        # Set Terminal Solution as Steady State Solution
+        FinHorizonAgent.solution_terminal = deepcopy(self.solution[0])
 
         dx = 0.0001  # Size of perturbation
         # Period in which the change in the interest rate occurs (second to last period)
@@ -2816,27 +3282,26 @@ class IndShockConsumerType(PerfForesightConsumerType):
 
         # this condition is because some attributes are specified as lists while other as floats
         if type(getattr(self, shk_param)) == list:
-            peturbed_list = (
+            perturbed_list = (
                 (i) * [getattr(self, shk_param)[0]]
                 + [getattr(self, shk_param)[0] + dx]
                 + (params["T_cycle"] - i - 1) * [getattr(self, shk_param)[0]]
             )  # Sequence of interest rates the agent faces
         else:
-            peturbed_list = (
+            perturbed_list = (
                 (i) * [getattr(self, shk_param)]
                 + [getattr(self, shk_param) + dx]
                 + (params["T_cycle"] - i - 1) * [getattr(self, shk_param)]
-            )  # Sequence of interest rates the agent 
-            
-        setattr(FinHorizonAgent, shk_param, peturbed_list)
+            )  # Sequence of interest rates the agent faces
+        setattr(FinHorizonAgent, shk_param, perturbed_list)
+        self.parameters[shk_param] = perturbed_list
 
         # Update income process if perturbed parameter enters the income shock distribution
         FinHorizonAgent.update_income_process()
 
-        # Solve
+        # Solve the "finite horizon" model, but don't re-solve the terminal period!
         FinHorizonAgent.solve()
 
-        #FinHorizonAgent.Rfree = params["T_cycle"] * [self.Rfree]
         # Use Harmenberg Neutral Measure
         FinHorizonAgent.neutral_measure = True
         FinHorizonAgent.update_income_process()
@@ -2844,6 +3309,14 @@ class IndShockConsumerType(PerfForesightConsumerType):
         # Calculate Transition Matrices
         FinHorizonAgent.define_distribution_grid()
         FinHorizonAgent.calc_transition_matrix()
+
+        # Normalized consumption Policy Grids across time
+        c_t = FinHorizonAgent.cPol_Grid
+        a_t = FinHorizonAgent.aPol_Grid
+
+        # Append steady state policy grid into list of policy grids as HARK does not provide the initial policy
+        c_t.append(self.c_ss)
+        a_t.append(self.a_ss)
 
         # Fake News Algorithm begins below ( To find fake news algorithm See page 2388 of https://onlinelibrary.wiley.com/doi/abs/10.3982/ECTA17434  )
 
@@ -2895,7 +3368,7 @@ class IndShockConsumerType(PerfForesightConsumerType):
         # List of change in transition matrix relative to the steady state transition matrix
         dlambda0_s = []
         for i in range(T):
-            dlambda0_s.append(tranmat_t[T  -   i] - tranmat_ss)
+            dlambda0_s.append(tranmat_t[T - i] - tranmat_ss)
 
         dlambda0_s = np.array(dlambda0_s)
 
@@ -2938,7 +3411,6 @@ class IndShockConsumerType(PerfForesightConsumerType):
         # First row of Fake News Matrix
         Curl_F_A[0] = A_curl_s
         Curl_F_C[0] = C_curl_s
-        
 
         for i in range(T - 1):
             for j in range(T):
@@ -2948,24 +3420,23 @@ class IndShockConsumerType(PerfForesightConsumerType):
         ########
         # STEP4 #  of the algorithm
         ########
-        
+
         # Function to compute jacobian matrix from fake news matrix
         def J_from_F(F):
             J = F.copy()
             for t in range(1, F.shape[0]):
-                J[1:, t] += J[:-1, t-1]
+                J[1:, t] += J[:-1, t - 1]
             return J
-        
+
         J_A = J_from_F(Curl_F_A)
         J_C = J_from_F(Curl_F_C)
-        
+
         ########
         # Additional step due to compute Zeroth Column of the Jacobian
-        ########   
-         
+        ########
+
         params = deepcopy(self.__dict__["parameters"])
-        params["T_cycle"] = 2 # Dimension of Jacobian Matrix
-        
+        params["T_cycle"] = 2  # Just need one transition matrix
         params["LivPrb"] = params["T_cycle"] * [self.LivPrb[0]]
         params["PermGroFac"] = params["T_cycle"] * [self.PermGroFac[0]]
         params["PermShkStd"] = params["T_cycle"] * [self.PermShkStd[0]]
@@ -2973,49 +3444,43 @@ class IndShockConsumerType(PerfForesightConsumerType):
         params["Rfree"] = params["T_cycle"] * [self.Rfree]
         params["UnempPrb"] = params["T_cycle"] * [self.UnempPrb]
         params["IncUnemp"] = params["T_cycle"] * [self.IncUnemp]
-        params['wage'] = params['T_cycle']*[self.wage[0]]
-        params['taxrate'] = params['T_cycle']*[self.taxrate[0]]
-        params['labor'] = params['T_cycle']*[self.labor[0]]
+        params["IncShkDstn"] = params["T_cycle"] * [self.IncShkDstn[0]]
+        params["wage"] = params["T_cycle"] * [self.wage[0]]
+        params["labor"] = params["T_cycle"] * [self.labor[0]]
+        params["taxrate"] = params["T_cycle"] * [self.taxrate[0]]
+        params["cycles"] = 1  # Now it's "finite" horizon while things are changing
         params['TranShkMean_Func'] = params['T_cycle']*[self.TranShkMean_Func[0]]
-        params['IncShkDstn'] = params['T_cycle']* [self.IncShkDstn[0]]
-        params['cFunc_terminal_'] = deepcopy(self.solution[0].cFunc)
-        
-        if shk_param == 'DiscFac':
-            
-            params['DiscFac'] = params['T_cycle']*[self.DiscFac]
 
         # Create instance of a finite horizon agent for calculation of zeroth
         ZerothColAgent = IndShockConsumerType(**params)
-        ZerothColAgent.cycles = 1  # required
-        
+        ZerothColAgent.solution_terminal = deepcopy(self.solution[0])
+
         # If parameter is in time invariant list then add it to time vary list
         ZerothColAgent.del_from_time_inv(shk_param)
         ZerothColAgent.add_to_time_vary(shk_param)
-        
-        if type(getattr(self, shk_param)) == list:
-            ZerothColAgent.shk_param = params['T_cycle'] * [getattr(self, shk_param)[0]]
-        else:
-            ZerothColAgent.shk_param = params['T_cycle'] * [getattr(self, shk_param)]
 
         # Update income process if perturbed parameter enters the income shock distribution
         ZerothColAgent.update_income_process()
 
-        # Solve
+        # Solve the "finite horizon" problem, but *don't* re-solve the "terminal period",
+        # because we're using the long run solution as the "terminal" solution here!
         ZerothColAgent.solve()
-        
+
         # this condition is because some attributes are specified as lists while other as floats
         if type(getattr(self, shk_param)) == list:
-            peturbed_list = (
-                 [getattr(self, shk_param)[0] + dx]
-                + (params["T_cycle"]  - 1) * [getattr(self, shk_param)[0]]
-            )  # Sequence of interest rates the agent faces
+            perturbed_list = [getattr(self, shk_param)[0] + dx] + (
+                params["T_cycle"] - 1
+            ) * [
+                getattr(self, shk_param)[0]
+            ]  # Sequence of interest rates the agent faces
         else:
-            peturbed_list = (
-                 [getattr(self, shk_param) + dx]
-                + (params["T_cycle"]  - 1) * [getattr(self, shk_param)]
-            )  # Sequence of interest rates the agent 
-            
-        setattr(ZerothColAgent, shk_param, peturbed_list) # Set attribute to agent
+            perturbed_list = [getattr(self, shk_param) + dx] + (
+                params["T_cycle"] - 1
+            ) * [getattr(self, shk_param)]
+            # Sequence of interest rates the agent
+
+        setattr(ZerothColAgent, shk_param, perturbed_list)  # Set attribute to agent
+        self.parameters[shk_param] = perturbed_list
 
         # Use Harmenberg Neutral Measure
         ZerothColAgent.neutral_measure = True
@@ -3024,28 +3489,27 @@ class IndShockConsumerType(PerfForesightConsumerType):
         # Calculate Transition Matrices
         ZerothColAgent.define_distribution_grid()
         ZerothColAgent.calc_transition_matrix()
-        
+
         tranmat_t_zeroth_col = ZerothColAgent.tran_matrix
         dstn_t_zeroth_col = self.vec_erg_dstn.T[0]
-        
+
         C_t_no_sim = np.zeros(T)
         A_t_no_sim = np.zeros(T)
 
         for i in range(T):
-            if i ==0:
-                dstn_t_zeroth_col = np.dot(tranmat_t_zeroth_col[i],dstn_t_zeroth_col)
+            if i == 0:
+                dstn_t_zeroth_col = np.dot(tranmat_t_zeroth_col[i], dstn_t_zeroth_col)
             else:
-                dstn_t_zeroth_col = np.dot(tranmat_ss,dstn_t_zeroth_col)
-                
-            C_t_no_sim[i] =  np.dot(self.cPol_Grid ,dstn_t_zeroth_col) 
-            A_t_no_sim[i] =  np.dot( self.aPol_Grid ,dstn_t_zeroth_col) 
+                dstn_t_zeroth_col = np.dot(tranmat_ss, dstn_t_zeroth_col)
 
-        J_A.T[0] = (A_t_no_sim - self.A_ss)/dx
-        J_C.T[0] = (C_t_no_sim - self.C_ss)/dx
-        
+            C_t_no_sim[i] = np.dot(self.cPol_Grid, dstn_t_zeroth_col)
+            A_t_no_sim[i] = np.dot(self.aPol_Grid, dstn_t_zeroth_col)
+
+        J_A.T[0] = (A_t_no_sim - self.A_ss) / dx
+        J_C.T[0] = (C_t_no_sim - self.C_ss) / dx
+
         return J_C, J_A
-
-
+    
     def calc_agg_path(self,Z,T):
         """
     
